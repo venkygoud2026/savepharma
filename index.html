@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Save Pharmacy - Direct WhatsApp Order</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            background-color: #EBF5FB;
+            padding: 12px;
+            display: flex;
+            justify-content: center;
+        }
+        .container {
+            background-color: #ffffff;
+            width: 100%;
+            max-width: 500px;
+            padding: 18px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+        }
+        .header {
+            background-color: #0077B6;
+            color: white;
+            padding: 14px;
+            border-radius: 8px;
+            text-align: center;
+            margin-bottom: 18px;
+        }
+        .header h2 {
+            font-size: 20px;
+            margin-bottom: 4px;
+        }
+        .header p {
+            font-size: 12px;
+            opacity: 0.92;
+        }
+        .form-group {
+            margin-bottom: 14px;
+        }
+        label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: #222;
+            margin-bottom: 6px;
+        }
+        select, input[type="text"], input[type="tel"], textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 14px;
+            outline: none;
+            background-color: #fafafa;
+        }
+        select:focus, input[type="text"]:focus, input[type="tel"]:focus, textarea:focus {
+            border-color: #0077B6;
+            background-color: #ffffff;
+        }
+        textarea {
+            resize: vertical;
+        }
+        /* 8 Picture Box Grid */
+        .image-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            margin-top: 6px;
+        }
+        .img-box {
+            position: relative;
+            aspect-ratio: 1;
+            border: 2px dashed #0096C7;
+            border-radius: 8px;
+            background-color: #F0F8FF;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            overflow: hidden;
+            text-align: center;
+        }
+        .img-box span {
+            font-size: 10px;
+            color: #0077B6;
+            font-weight: bold;
+            padding: 2px;
+        }
+        .img-box input[type="file"] {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+        }
+        .img-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: none;
+        }
+        .geo-btn {
+            background-color: #0096C7;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: bold;
+            width: 100%;
+            margin-bottom: 6px;
+        }
+        .geo-btn:active {
+            background-color: #0077B6;
+        }
+        .submit-btn {
+            background-color: #25D366; /* WhatsApp Green */
+            color: white;
+            border: none;
+            padding: 14px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            width: 100%;
+            cursor: pointer;
+            margin-top: 12px;
+            box-shadow: 0 3px 6px rgba(0,0,0,0.15);
+        }
+        .submit-btn:active {
+            background-color: #1EBE57;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h2>Save Pharmacy</h2>
+        <p>Scan & Send Direct WhatsApp Order</p>
+    </div>
+
+    <form id="whatsappOrderForm">
+
+        <!-- 1. Auto-Fill Mobile Number Box (Primary Focus) -->
+        <div class="form-group">
+            <label for="contactNumbers">Customer Phone Number * (Auto-Fill Supported)</label>
+            <input 
+                type="tel" 
+                id="contactNumbers" 
+                name="phone" 
+                autocomplete="tel" 
+                placeholder="Tap to auto-fill or enter mobile number" 
+                required 
+            />
+        </div>
+
+        <!-- 2. Select Medicine Category / Reason -->
+        <div class="form-group">
+            <label for="medicineCategory">Select Reason / Requirement *</label>
+            <select id="medicineCategory" onchange="toggleOtherSpace()">
+                <option value="1. Fever">1. Fever</option>
+                <option value="2. Cough">2. Cough</option>
+                <option value="3. Cold">3. Cold</option>
+                <option value="4. Body Pains">4. Body Pains</option>
+                <option value="5. Headache">5. Headache</option>
+                <option value="6. Other">6. Other</option>
+            </select>
+        </div>
+
+        <!-- Medicine Details (3 line space) -->
+        <div class="form-group">
+            <label for="otherMedicineText">Medicine Names / Details (3 Line Space)</label>
+            <textarea id="otherMedicineText" rows="3" placeholder="Enter medicine names, dosages, or details here..."></textarea>
+        </div>
+
+        <!-- 3. Capture Prescription or Medicine Images (8 Boxes) -->
+        <div class="form-group">
+            <label>Capture Medicine / Prescription Photos (Up to 8)</label>
+            <div class="image-grid">
+                <script>
+                    for(let i=1; i<=8; i++) {
+                        document.write(`
+                            <div class="img-box" id="box-${i}">
+                                <span id="label-${i}">📷 Pic ${i}</span>
+                                <img id="preview-${i}" />
+                                <input type="file" accept="image/*" capture="environment" onchange="previewImage(this, ${i})">
+                            </div>
+                        `);
+                    }
+                </script>
+            </div>
+        </div>
+
+        <!-- 4. Geo Tag Location -->
+        <div class="form-group">
+            <label>Tag Live Location Coordinates</label>
+            <button type="button" class="geo-btn" onclick="getGeoLocation()">📍 Click to Add Live Location</button>
+            <input type="text" id="locationCoords" placeholder="Latitude & Longitude combo will display here" readonly>
+        </div>
+
+        <!-- 5. Address Details (3 Line Space) -->
+        <div class="form-group">
+            <label for="customerAddress">Delivery Address Details * (3 Line Space)</label>
+            <textarea id="customerAddress" rows="3" placeholder="House / Flat No., Street Name&#10;Landmark / Area Name&#10;City / Pin Code" required></textarea>
+        </div>
+
+        <!-- 6. Submit Button -->
+        <button type="button" class="submit-btn" onclick="submitToWhatsApp()">📲 Send Order to Shop Owner</button>
+    </form>
+</div>
+
+<script>
+    let capturedImagesCount = 0;
+
+    // Trigger phone autofill focus on load
+    window.onload = function() {
+        const phoneInput = document.getElementById('contactNumbers');
+        if (phoneInput) {
+            phoneInput.focus();
+        }
+    };
+
+    function toggleOtherSpace() {
+        const cat = document.getElementById('medicineCategory').value;
+        const otherText = document.getElementById('otherMedicineText');
+        if (cat === "6. Other") {
+            otherText.focus();
+        }
+    }
+
+    // Image preview handler
+    function previewImage(input, index) {
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const preview = document.getElementById(`preview-${index}`);
+                const label = document.getElementById(`label-${index}`);
+                preview.src = e.target.result;
+                preview.style.display = 'block';
+                label.style.display = 'none';
+                capturedImagesCount++;
+            }
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
+    // Capture Exact GPS Coordinates
+    function getGeoLocation() {
+        const coordBox = document.getElementById('locationCoords');
+        if (navigator.geolocation) {
+            coordBox.value = "Fetching GPS coordinates...";
+            navigator.geolocation.getCurrentPosition(
+                (pos) => {
+                    const lat = pos.coords.latitude.toFixed(6);
+                    const lng = pos.coords.longitude.toFixed(6);
+                    coordBox.value = `${lat}, ${lng}`;
+                },
+                (err) => {
+                    alert("Location permission required. Please turn on Location/GPS.");
+                    coordBox.value = "Location permission denied";
+                },
+                { enableHighAccuracy: true, timeout: 10000 }
+            );
+        } else {
+            alert("Geolocation is not supported by this browser.");
+        }
+    }
+
+    // Form submission & redirect to WhatsApp number 9701726873
+    function submitToWhatsApp() {
+        const contacts = document.getElementById('contactNumbers').value.trim();
+        const category = document.getElementById('medicineCategory').value;
+        const medDetails = document.getElementById('otherMedicineText').value.trim() || "N/A";
+        const coords = document.getElementById('locationCoords').value.trim() || "Not Captured";
+        const address = document.getElementById('customerAddress').value.trim();
+
+        if (!contacts || !address) {
+            alert("Please fill in your Contact Number and Address.");
+            return;
+        }
+
+        const targetNumber = "919701726873";
+
+        // Build WhatsApp Message with Google Maps Deep Link for Shop Owner Navigation
+        let msg = `*NEW MEDICINE ORDER - SAVE PHARMACY*\n`;
+        msg += `------------------------------------\n`;
+        msg += `📞 *Customer Phone:* ${contacts}\n`;
+        msg += `💊 *Category:* ${category}\n`;
+        msg += `📝 *Medicine Details:* \n${medDetails}\n\n`;
+        msg += `🏠 *Delivery Address:* \n${address}\n\n`;
+        msg += `📍 *Geo Coordinates:* ${coords}\n`;
+        
+        // Auto-Generate Clickable Google Maps Pin Link for Shop Owner
+        if (coords.includes(',')) {
+            msg += `🗺️ *Click to Open Maps Navigation:* \nhttps://maps.google.com/?q=${coords.replace(/\s+/g, '')}\n\n`;
+        } else {
+            msg += `🗺️ *Maps Link:* Location coordinates not captured\n\n`;
+        }
+        
+        msg += `📷 *Photos Attached:* ${capturedImagesCount} prescription/medicine photo(s)\n`;
+        msg += `------------------------------------\n`;
+        msg += `*Shop Owner Action:* Reply YES to ACCEPT & confirm delivery.`;
+
+        const encodedMsg = encodeURIComponent(msg);
+        const whatsappUrl = `https://wa.me/${targetNumber}?text=${encodedMsg}`;
+
+        window.open(whatsappUrl, '_blank');
+    }
+</script>
+
+</body>
+</html>
